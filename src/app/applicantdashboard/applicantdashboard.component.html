@@ -1,0 +1,58 @@
+<app-navbar></app-navbar>
+<div class="container min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="row justify-content-center w-100">
+      <div class="col-12 col-lg-10">
+        <div class="card shadow-lg p-4 border-0">
+          <div class="text-center mb-4">
+            <h4 class="text-success fw-semibold">Welcome, Applicant 👋</h4>
+            <p class="text-muted">Manage your job hunt and explore opportunities.</p>
+          </div>
+  
+          <div class="row g-4">
+            <!-- Browse Jobs -->
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-search fs-1 text-success mb-3"></i>
+                  <h5 class="card-title">Browse Jobs</h5>
+                  <p class="text-muted">Explore open positions tailored for you.</p>
+                  <a routerLink="/browse-jobs" class="btn btn-success btn-sm">Start Browsing</a>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Applied Jobs -->
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-clipboard-check fs-1 text-success mb-3"></i>
+                  <h5 class="card-title">Applied Jobs</h5>
+                  <p class="text-muted">You've applied to <strong>5</strong> jobs so far.</p>
+                  <a routerLink="/applied-jobs" class="btn btn-outline-success btn-sm">View Applications</a>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Resume/Profile -->
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-person-lines-fill fs-1 text-success mb-3"></i>
+                  <h5 class="card-title">Profile Setup</h5>
+                  <p class="text-muted">Complete your resume and profile to apply faster.</p>
+                  <a routerLink="/profile" class="btn btn-outline-success btn-sm">Update Profile</a>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="text-end mt-4">
+            <button class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

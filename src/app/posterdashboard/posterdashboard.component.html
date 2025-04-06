@@ -1,0 +1,63 @@
+<app-navbar></app-navbar>
+<div class="container min-vh-100 d-flex align-items-center justify-content-center bg-light">
+ 
+    <div class="row w-100 justify-content-center mt-2">
+      <div class="col-12 col-lg-10">
+        <div class="card shadow-lg p-4 border-0">
+          <h4 class="text-center text-success mb-4 fw-semibold">Welcome, Job Poster 👩‍💼</h4>
+          <p class="text-center text-muted mb-5">Manage your job postings and company profile from here</p>
+  
+          <div class="row g-4">
+            <!-- Post a Job -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-plus-circle display-6 text-success mb-3"></i>
+                  <h6 class="card-title mb-2">Post a Job</h6>
+                  <p class="text-muted small">Create job listings and reach potential applicants.</p>
+                  <a routerLink="/post-job" class="btn btn-success btn-sm mt-2">Post Job</a>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Manage Jobs -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-briefcase display-6 text-success mb-3"></i>
+                  <h6 class="card-title mb-2">Manage Jobs</h6>
+                  <p class="text-muted small">View, edit, or close job postings.</p>
+                  <a routerLink="/manage-jobs" class="btn btn-success btn-sm mt-2">Manage</a>
+                </div>
+              </div>
+            </div>
+  
+            <!-- View Applications -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-inbox display-6 text-success mb-3"></i>
+                  <h6 class="card-title mb-2">Applications</h6>
+                  <p class="text-muted small">Track applicants who applied to your jobs.</p>
+                  <a routerLink="/applications" class="btn btn-success btn-sm mt-2">View Applications</a>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Manage Profile -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                  <i class="bi bi-person-gear display-6 text-success mb-3"></i>
+                  <h6 class="card-title mb-2">Manage Profile</h6>
+                  <p class="text-muted small">Update your company and contact info.</p>
+                  <a routerLink="/poster/profile" class="btn btn-success btn-sm mt-2">Edit Profile</a>
+                </div>
+              </div>
+            </div>
+          </div> <!-- row end -->
+        </div>
+      </div>
+    </div>
+  </div>
+  

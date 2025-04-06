@@ -1,0 +1,62 @@
+<div class="container min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="row justify-content-center w-100">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+        <div class="card shadow-lg p-4 border-0">
+          <h4 class="text-center mb-4 text-success fw-semibold">Welcome Back 👋</h4>
+  
+          <!-- Google Sign In -->
+          <div class="d-grid mb-3">
+            <button type="button" class="btn btn-outline-dark">
+              <i class="bi bi-google me-2"></i> Continue with Google
+            </button>
+          </div>
+  
+          <div class="text-center mb-3">
+            <small class="text-muted">or login with email</small>
+          </div>
+  
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="you@example.com"
+              />
+              <div class="form-text text-danger" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+                Valid email is required
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                class="form-control"
+                placeholder="Enter your password"
+              />
+              <div class="form-text text-danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+                Password is required
+              </div>
+            </div>
+  
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success" [disabled]="loginForm.invalid">
+                Login
+              </button>
+            </div>
+          </form>
+  
+          <div class="text-center mt-3">
+            <small class="text-muted">Don't have an account?</small>
+            <a routerLink="/signup" class="ms-1">Sign up</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
