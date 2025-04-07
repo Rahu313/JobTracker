@@ -4,29 +4,11 @@
       <div class="card shadow-lg p-4 border-0">
         <h4 class="text-center mb-4 text-success fw-semibold">Create an Account</h4>
 
-        <!-- Optional: Google Sign Up -->
-        <!-- 
-        <div class="d-grid mb-3">
-          <button type="button" class="btn btn-outline-dark">
-            <i class="bi bi-google me-2"></i> Continue with Google
-          </button>
-        </div>
-        <div class="text-center mb-3">
-          <small class="text-muted">or sign up with email</small>
-        </div>
-        -->
-
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-          <!-- Name -->
+          <!-- Full Name -->
           <div class="mb-3">
             <label for="name" class="form-label">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              class="form-control"
-              formControlName="name"
-              placeholder="John Doe"
-            />
+            <input type="text" id="name" class="form-control" formControlName="name" placeholder="John Doe" />
             <div class="form-text text-danger" *ngIf="signupForm.get('name')?.touched && signupForm.get('name')?.invalid">
               <small *ngIf="signupForm.get('name')?.errors?.['required']">Name is required.</small>
             </div>
@@ -35,13 +17,7 @@
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
-            <input
-              type="email"
-              id="email"
-              class="form-control"
-              formControlName="email"
-              placeholder="you@example.com"
-            />
+            <input type="email" id="email" class="form-control" formControlName="email" placeholder="you@example.com" />
             <div class="form-text text-danger" *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.invalid">
               <small *ngIf="signupForm.get('email')?.errors?.['required']">Email is required.</small>
               <small *ngIf="signupForm.get('email')?.errors?.['email']">Invalid email format.</small>
@@ -51,73 +27,76 @@
           <!-- Password -->
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="form-control"
-              formControlName="password"
-              placeholder="Enter your password"
-            />
+            <input type="password" id="password" class="form-control" formControlName="password" placeholder="Enter password" />
             <div class="form-text text-danger" *ngIf="signupForm.get('password')?.touched && signupForm.get('password')?.invalid">
               <small *ngIf="signupForm.get('password')?.errors?.['required']">Password is required.</small>
-              <small *ngIf="signupForm.get('password')?.errors?.['minlength']">Minimum 6 characters required.</small>
+              <small *ngIf="signupForm.get('password')?.errors?.['minlength']">Min 6 characters.</small>
             </div>
           </div>
 
           <!-- Confirm Password -->
           <div class="mb-3">
             <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              class="form-control"
-              formControlName="confirmPassword"
-              placeholder="Re-enter your password"
-            />
+            <input type="password" id="confirmPassword" class="form-control" formControlName="confirmPassword" placeholder="Re-enter password" />
             <div class="form-text text-danger" *ngIf="signupForm.hasError('mismatch') && signupForm.get('confirmPassword')?.touched">
               <small>Passwords do not match.</small>
             </div>
           </div>
+
+          <!-- Role Selection -->
           <div class="mb-3">
             <label class="form-label">Register as</label>
             <div class="d-flex gap-3">
               <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="applicant"
-                  value="applicant"
-                  formControlName="role"
-                />
-                <label class="form-check-label" for="applicant">
-                  Applicant
-                </label>
+                <input class="form-check-input" type="radio" id="applicant" value="applicant" formControlName="role" (change)="onRoleChange()" />
+                <label class="form-check-label" for="applicant">Applicant</label>
               </div>
-          
               <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="poster"
-                  value="poster"
-                  formControlName="role"
-                />
-                <label class="form-check-label" for="poster">
-                  Job Poster
-                </label>
+                <input class="form-check-input" type="radio" id="poster" value="poster" formControlName="role" (change)="onRoleChange()" />
+                <label class="form-check-label" for="poster">Job Poster</label>
               </div>
             </div>
-          
             <div class="text-danger mt-1" *ngIf="signupForm.get('role')?.touched && signupForm.get('role')?.invalid">
               Please select a role.
             </div>
           </div>
-          
+
+          <!-- Applicant Fields -->
+          <div *ngIf="signupForm.get('role')?.value === 'applicant'">
+            <!-- Skills -->
+            <div class="mb-3">
+              <label for="skills" class="form-label">Skills</label>
+              <input type="text" id="skills" class="form-control" formControlName="skills" placeholder="e.g. Angular, Java" />
+            </div>
+
+            <!-- Resume Upload -->
+            <div class="mb-3">
+              <label for="resume" class="form-label">Upload Resume</label>
+              <input type="file" class="form-control" id="resume" (change)="onResumeSelected($event)" />
+              <div class="form-text text-danger" *ngIf="resumeError">
+                {{ resumeError }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Poster Fields -->
+          <div *ngIf="signupForm.get('role')?.value === 'poster'">
+            <!-- Company Name -->
+            <div class="mb-3">
+              <label for="companyName" class="form-label">Company Name</label>
+              <input type="text" id="companyName" class="form-control" formControlName="companyName" placeholder="ABC Corp" />
+            </div>
+
+            <!-- Company Website -->
+            <div class="mb-3">
+              <label for="companyWebsite" class="form-label">Company Website</label>
+              <input type="url" id="companyWebsite" class="form-control" formControlName="companyWebsite" placeholder="https://example.com" />
+            </div>
+          </div>
+
           <!-- Submit -->
           <div class="d-grid">
-            <button type="submit" class="btn btn-success" [disabled]="signupForm.invalid">
-              Sign Up
-            </button>
+            <button type="submit" class="btn btn-success" [disabled]="signupForm.invalid">Sign Up</button>
           </div>
         </form>
 

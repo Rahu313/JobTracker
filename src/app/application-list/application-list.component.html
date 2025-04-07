@@ -1,0 +1,29 @@
+<app-navbar></app-navbar>
+<div class="container my-4">
+    <h4 class="mb-4 text-success">Manage Applications</h4>
+  
+    <div class="row g-4">
+      <div class="col-md-6" *ngFor="let app of applications">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title text-success">{{ app.applicantName }}</h5>
+            <p class="mb-1"><strong>Email:</strong> {{ app.email }}</p>
+            <p class="mb-1"><strong>Job Title:</strong> {{ app.jobTitle }}</p>
+            <p class="mb-1"><strong>Applied On:</strong> {{ app.appliedDate }}</p>
+            <p class="mb-1"><strong>Skills:</strong> {{ app.skills }}</p>
+  
+            <a [href]="app.resumeLink" target="_blank" class="btn btn-outline-secondary btn-sm mt-2">
+              View Resume
+            </a>
+  
+            <div class="mt-3 d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm">Shortlist</button>
+              <button class="btn btn-outline-danger btn-sm">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  

@@ -1,0 +1,86 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <h3 class="mb-4 text-center text-success">Manage Profile</h3>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+        <!-- Full Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Full Name</label>
+          <input type="text" id="name" class="form-control" formControlName="name" />
+          <div class="text-danger" *ngIf="profileForm.get('name')?.touched && profileForm.get('name')?.invalid">
+            <small *ngIf="profileForm.get('name')?.errors?.['required']">Name is required.</small>
+          </div>
+        </div>
+
+        <!-- Email (readonly) -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-control" formControlName="email" [readonly]="true" />
+        </div>
+
+        <!-- Role (readonly) -->
+        <div class="mb-3">
+          <label for="role" class="form-label">Role</label>
+          <input type="text" id="role" class="form-control" formControlName="role" [readonly]="true" />
+        </div>
+
+        <!-- Applicant Fields -->
+        <div *ngIf="profileForm.get('role')?.value === 'applicant'">
+          <div class="mb-3">
+            <label for="resume" class="form-label">Upload Resume</label>
+            <input type="file" id="resume" class="form-control" (change)="onFileChange($event)" />
+          </div>
+
+          <div class="mb-3">
+            <label for="skills" class="form-label">Skills</label>
+            <input type="text" id="skills" class="form-control" formControlName="skills" />
+          </div>
+        </div>
+
+        <!-- Poster Fields -->
+        <div *ngIf="profileForm.get('role')?.value === 'poster'">
+          <div class="mb-3">
+            <label for="companyName" class="form-label">Company Name</label>
+            <input type="text" id="companyName" class="form-control" formControlName="companyName" />
+          </div>
+
+          <div class="mb-3">
+            <label for="companyWebsite" class="form-label">Company Website</label>
+            <input type="text" id="companyWebsite" class="form-control" formControlName="companyWebsite" />
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- Password Update Section -->
+        <h6 class="mb-3 text-muted">Change Your Password (Optional)</h6>
+
+        <div class="mb-3">
+          <label for="newPassword" class="form-label">New Password</label>
+          <input type="password" id="newPassword" class="form-control" formControlName="newPassword" />
+          <div class="text-danger" *ngIf="profileForm.get('newPassword')?.touched && profileForm.get('newPassword')?.invalid">
+            <small *ngIf="profileForm.get('newPassword')?.errors?.['minlength']">Minimum 6 characters required.</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm New Password</label>
+          <input type="password" id="confirmPassword" class="form-control" formControlName="confirmPassword" />
+          <div class="text-danger" *ngIf="profileForm.hasError('passwordMismatch') && profileForm.get('confirmPassword')?.touched">
+            <small>Passwords do not match.</small>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-grid mt-4">
+          <button class="btn btn-success" type="submit" [disabled]="profileForm.invalid">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
