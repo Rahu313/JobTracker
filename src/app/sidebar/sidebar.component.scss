@@ -1,0 +1,18 @@
+.sidebar {
+    width: 240px;
+  }
+  
+  .nav-link.active {
+    background-color: #198754; /* Bootstrap success */
+    color: #fff !important;
+  }
+  
+  .nav-link {
+    color: #333;
+  }
+  
+  .nav-link:hover {
+    background-color: #e9ecef;
+    color: #000;
+  }
+  

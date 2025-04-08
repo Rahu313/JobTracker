@@ -1,0 +1,46 @@
+
+
+<div class="container mt-4">
+  <h3 class="text-success mb-3">Browse Jobs</h3>
+
+  <!-- Search Bar -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search by job title or company"
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+  </div>
+
+  <!-- Job Cards -->
+  <div class="row g-4">
+    <div
+      class="col-md-6"
+      *ngFor="let job of filteredJobs()"
+    >
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{ job.title }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
+          <p class="card-text">{{ job.description }}</p>
+          <p class="card-text mb-1">
+            <strong>Location:</strong> {{ job.location }}
+          </p>
+          <p class="card-text">
+            <strong>Posted On:</strong>
+            {{ job.postedDate | date: 'mediumDate' }}
+          </p>
+          <button class="btn btn-outline-success btn-sm">Apply Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Jobs Found -->
+  <div *ngIf="filteredJobs().length === 0" class="mt-4 text-center text-muted">
+    <p>No jobs found matching your search.</p>
+  </div>
+</div>
