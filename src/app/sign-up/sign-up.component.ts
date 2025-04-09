@@ -21,7 +21,7 @@ export class SignUpComponent {
   resumeFile: File | null = null;
   resumeError: string = '';
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private authService:AuthService) {}
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
@@ -94,10 +94,15 @@ export class SignUpComponent {
       formData.append('companyWebsite', this.signupForm.get('companyWebsite')?.value);
     }
 
-    // Replace with your actual API endpoint
-    this.http.post('YOUR_BACKEND_API/signup', formData).subscribe(
-      (      res: any) => console.log('Signup successful', res),
-      (      err: any) => console.error('Signup failed', err)
-    );
+    
+    this.authService.signup(formData).subscribe({
+      next: (res:any) => {
+        console.log('Signup success:', res);
+        // Navigate to login or dashboard
+      },
+      error: (err:any) => {
+        console.error('Signup failed:', err);
+      }
+    });
   }
 }
