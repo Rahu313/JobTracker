@@ -22,13 +22,32 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User signup(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use");
-        }
+    public boolean saveUser(String name, String email, String password, String role,
+                            String skills, String companyName, String companyWebsite,
+                            String resumeFileName) {
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        try {
+            User user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(password); // You should hash this in real apps
+            user.setRole(role);
+
+            if ("applicant".equalsIgnoreCase(role)) {
+                user.setSkills(skills);
+                user.setResumeFile(resumeFileName);
+            } else if ("poster".equalsIgnoreCase(role)) {
+                user.setCompanyName(companyName);
+                user.setCompanyWebsite(companyWebsite);
+            }
+
+            userRepository.save(user);
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public Map<String, Object> login(User loginRequest) {

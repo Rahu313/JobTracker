@@ -1,4 +1,5 @@
 package com.jobtracker.model;
+
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,7 +15,45 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 public class User {
 
-    public User(Long id, String name, String email, String password, String role, String authProvider,
+	public User() {
+		super();
+	}
+
+	public User(Long id, String name, String email, String password, String role, String authProvider,
+			String profilePic, LocalDateTime createdAt, String resumeFile, String skills, String companyName,
+			String companyWebsite) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.authProvider = authProvider;
+		this.profilePic = profilePic;
+		this.createdAt = createdAt;
+		this.resumeFile = resumeFile;
+		this.skills = skills;
+		this.companyName = companyName;
+		this.companyWebsite = companyWebsite;
+	}
+
+	public User(Long id, String name, String email, String password, String role, String authProvider,
+			String profilePic, LocalDateTime createdAt, String resumeFile, String skills, String companyName) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.authProvider = authProvider;
+		this.profilePic = profilePic;
+		this.createdAt = createdAt;
+		this.resumeFile = resumeFile;
+		this.skills = skills;
+		this.companyName = companyName;
+	}
+
+	public User(Long id, String name, String email, String password, String role, String authProvider,
 			String profilePic, LocalDateTime createdAt) {
 		super();
 		this.id = id;
@@ -28,35 +67,37 @@ public class User {
 	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
+	private String name;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+	@Column(unique = true, nullable = false)
+	private String email;
 
-    @JsonIgnore
-    private String password; // Nullable for Google sign-in
+	@JsonIgnore
+	private String password; // Nullable for Google sign-in
 
-    private String role; // "applicant" or "poster"
+	private String role; // "applicant" or "poster"
 
-    @Column(name = "auth_provider")
-    private String authProvider; // e.g., "google", "local"
+	@Column(name = "auth_provider")
+	private String authProvider; // e.g., "google", "local"
 
-    @Column(name = "profile_pic")
-    private String profilePic;
+	@Column(name = "profile_pic")
+	private String profilePic;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private String resumeLink;  // Instead of file
-
+	@Column(name = "created_at")
+	private LocalDateTime createdAt = LocalDateTime.now();
+	private String resumeFile; // Instead of file
+	private String skills;
+	private String companyName;
+	private String companyWebsite;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	void setId(Long id) {
 		this.id = id;
 	}
 
@@ -116,13 +157,37 @@ public class User {
 		this.createdAt = createdAt;
 	}
 
-	public String getResumeLink() {
-		return resumeLink;
+	public String getResumeFile() {
+		return resumeFile;
 	}
 
-	public void setResumeLink(String resumeLink) {
-		this.resumeLink = resumeLink;
+	public void setResumeFile(String resumeFile) {
+		this.resumeFile = resumeFile;
 	}
 
-    // Getters and Setters
+	public String getSkills() {
+		return skills;
+	}
+
+	public void setSkills(String skills) {
+		this.skills = skills;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getCompanyWebsite() {
+		return companyWebsite;
+	}
+
+	public void setCompanyWebsite(String companyWebsite) {
+		this.companyWebsite = companyWebsite;
+	}
+
+	// Getters and Setters
 }
