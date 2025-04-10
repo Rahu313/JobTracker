@@ -85,12 +85,18 @@
             <div class="mb-3">
               <label for="companyName" class="form-label">Company Name</label>
               <input type="text" id="companyName" class="form-control" formControlName="companyName" placeholder="ABC Corp" />
+              <div class="text-danger mt-1" *ngIf="signupForm.get('companyName')?.touched && signupForm.get('companyName')?.invalid">
+                Please enter company name.
+              </div>
             </div>
 
             <!-- Company Website -->
             <div class="mb-3">
               <label for="companyWebsite" class="form-label">Company Website</label>
               <input type="url" id="companyWebsite" class="form-control" formControlName="companyWebsite" placeholder="https://example.com" />
+              <div class="text-danger mt-1" *ngIf="signupForm.get('companyWebsite')?.touched && signupForm.get('companyName')?.invalid">
+                Please enter company website.
+              </div>
             </div>
           </div>
 

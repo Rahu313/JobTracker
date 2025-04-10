@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sign-up',
@@ -20,8 +21,9 @@ export class SignUpComponent {
   signupForm!: FormGroup;
   resumeFile: File | null = null;
   resumeError: string = '';
+  submitted:boolean=false;
 
-  constructor(private fb: FormBuilder, private authService:AuthService) {}
+  constructor(private fb: FormBuilder, private authService:AuthService,private toastr: ToastrService,private router:Router) {}
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
@@ -76,7 +78,10 @@ export class SignUpComponent {
   }
 
   onSubmit(): void {
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.valid){
+     this.submitted=true;
+      return;
+    }
 
     const formData = new FormData();
     formData.append('name', this.signupForm.get('name')?.value);
@@ -97,10 +102,13 @@ export class SignUpComponent {
     
     this.authService.signup(formData).subscribe({
       next: (res:any) => {
+        this.toastr.success(res.message);
+        this.router.navigate(["/login"]);
         console.log('Signup success:', res);
         // Navigate to login or dashboard
       },
       error: (err:any) => {
+        this.toastr.success(err.message);
         console.error('Signup failed:', err);
       }
     });
