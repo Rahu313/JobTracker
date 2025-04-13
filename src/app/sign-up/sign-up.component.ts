@@ -78,7 +78,7 @@ export class SignUpComponent {
   }
 
   onSubmit(): void {
-    if (this.signupForm.valid){
+    if (this.signupForm.invalid){
      this.submitted=true;
       return;
     }

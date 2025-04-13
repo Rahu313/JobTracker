@@ -10,10 +10,12 @@ import { ApplicationListComponent } from './application-list/application-list.co
 import { BrowseJobsComponent } from './browse-jobs/browse-jobs.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { DashboardLayoutComponent } from './dashboard-layout/dashboard-layout.component';
+import { ForgetPasswordComponent } from './forget-password/forget-password.component';
 
 export const routes: Routes = [{ path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'signup', component: SignUpComponent },
     { path: 'login', component: LoginComponent },
+    { path: 'forgot-password', component: ForgetPasswordComponent },
     {
         path: '',
         component: DashboardLayoutComponent,
@@ -26,6 +28,7 @@ export const routes: Routes = [{ path: '', redirectTo: 'login', pathMatch: 'full
             { path: 'applications', component: ApplicationListComponent },
             { path: 'browse-jobs', component: BrowseJobsComponent },
             { path: 'applied-jobs', component: ApplicationsComponent },
+        
         ]
       }
     

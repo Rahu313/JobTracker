@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -9,10 +9,12 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
-  userRole: string = 'poster'; // Replace this with a dynamic value
-
+export class SidebarComponent implements OnInit {
+  userRole: any
   constructor(private router: Router) {}
+  ngOnInit(): void {
+   this.userRole = localStorage.getItem('role'); // Replace this with a dynamic value
+  }
 
   logout() {
     localStorage.clear();

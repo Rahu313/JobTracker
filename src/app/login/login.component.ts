@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { UserdataService } from '../services/userdata.service';
 
 @Component({
   selector: 'app-login',
@@ -19,19 +22,37 @@ export class LoginComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   });
+constructor(private authService:AuthService, private toastr:ToastrService,private userDataService:UserdataService){
 
+}
   onSubmit() {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    const { email, password } = this.loginForm.value;
-
-    if (user && user.email === email && user.password === password) {
-      alert('Login successful!');
-      localStorage.setItem('isLoggedIn', 'true');
-      this.router.navigate(['/dashboard']);
-    } else {
-      alert('Invalid credentials');
+    if (this.loginForm.invalid) {
+      this.toastr.warning('Please fill all required fields correctly');
+      return;
     }
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        if(res.status==true){
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('role', res.data.user.role)
+          this.toastr.success('Login successful!', 'Success');
+          this.userDataService.setName(res.data.user.name);
+          const role = res.data.user.role;
+          if (role === 'poster') {
+              this.router.navigate(['/poster-dashboard']);
+          } else {
+            this.router.navigate(['/applicant-dashboard']); 
+          }
+        } else{
+          this.toastr.error(res.message,'Error');
+        }
+     
+      },
+      error: (err) => {
+        this.toastr.error(err.message,'Error');
+      }
+    });
   }
+
 }

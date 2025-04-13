@@ -30,7 +30,7 @@
               </div>
             </div>
   
-            <div class="mb-3">
+            <div class="mb-1">
               <label for="password" class="form-label">Password</label>
               <input
                 type="password"
@@ -43,6 +43,10 @@
                 Password is required
               </div>
             </div>
+            <div class="text-end mb-3">
+              <a routerLink="/forgot-password" class="text-decoration-none small text-primary">Forgot Password?</a>
+            </div>
+  
   
             <div class="d-grid">
               <button type="submit" class="btn btn-success" [disabled]="loginForm.invalid">

@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AuthService } from '../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-manage-profile',
@@ -14,35 +16,55 @@ import { NavbarComponent } from '../navbar/navbar.component';
 export class ManageProfileComponent {
   profileForm!: FormGroup;
   selectedResumeFile: File | null = null;
-
-  constructor(private fb: FormBuilder) {}
+  userData:any;
+  constructor(private fb: FormBuilder,private authService:AuthService,private toastrService:ToastrService) {}
 
   ngOnInit(): void {
-    const userData = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'applicant', // or 'poster'
-      skills: 'Angular, TypeScript',
-      companyName: 'Tech Corp',
-      companyWebsite: 'https://techcorp.com'
-    };
+    this.profileForm = this.fb.group({
+      name: [''],
+      email: [''],
+      role: [''],
+      resumeLink: [null],
+      skills: [''],
+      companyName: [''],
+      companyWebsite: [''],
+      newPassword: [''],
+      confirmPassword: ['']
+    }, { validators: this.passwordMatchValidator });
+    
+    this.authService.getProfile().subscribe((res:any)=>{
+      console.log(res)
+      if(res.status==true){
+        // this.toastrService.error('Error',res.message)
+        this.userData=res.data;
+        this.initFormGroup();
+      }
+      else{
+        this.toastrService.error('Error',res.message)
+      }
+     
+          },err=>{
+            this.toastrService.error('Error',err.message)
+          })
 
+    
+  }
+  initFormGroup(){
     this.profileForm = this.fb.group(
       {
-        name: [userData.name, Validators.required],
-        email: [{ value: userData.email, disabled: true }, [Validators.required, Validators.email]],
-        role: [{ value: userData.role, disabled: true }],
+        name: [this.userData.name, Validators.required],
+        email: [{ value: this.userData.email, disabled: true }, [Validators.required, Validators.email]],
+        role: [{ value: this.userData.role, disabled: true }],
         resumeLink: [null],
-        skills: [userData.skills],
-        companyName: [userData.companyName],
-        companyWebsite: [userData.companyWebsite],
+        skills: [this.userData.skills],
+        companyName: [this.userData.companyName],
+        companyWebsite: [this.userData.companyWebsite],
         newPassword: ['', [Validators.minLength(6)]],
         confirmPassword: ['']
       },
       { validators: this.passwordMatchValidator }
-    );
+    );  
   }
-
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('newPassword')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
@@ -62,10 +84,10 @@ export class ManageProfileComponent {
     if (this.profileForm.invalid) return;
 
     const formValues = this.profileForm.getRawValue();
-
     const formData = new FormData();
+
+    formData.append('userId', this.userData.id); 
     formData.append('name', formValues.name);
-    formData.append('email', formValues.email);
     formData.append('role', formValues.role);
 
     if (formValues.role === 'applicant') {
@@ -84,7 +106,16 @@ export class ManageProfileComponent {
       formData.append('newPassword', formValues.newPassword);
     }
 
-    // Submit to your backend API
-    console.log('Submitting form data:', formData);
+    this.authService.updateProfile(formData).subscribe(
+      (res: any) => {
+        if (res.status === true) {
+          this.toastrService.success('Success', res.message);
+          this.ngOnInit(); // refresh user data
+        } else {
+          this.toastrService.error('Error', res.message);
+        }
+      },
+      (err) => this.toastrService.error('Error', err.message)
+    );
   }
 }

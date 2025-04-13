@@ -19,6 +19,13 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/user/signup`, userData);
   }
 
+  forgotPassword(email: string) {
+    return this.http.post(`${this.apiUrl}/user/forgot-password`, { email });
+  }
+  getProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user/me`);
+  }
+  
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
@@ -29,6 +36,13 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
+  updateProfile(formData: FormData) {
+    return this.http.post<any>(`${this.apiUrl}/user/update-profile`, formData);
+  }
+  
 }
