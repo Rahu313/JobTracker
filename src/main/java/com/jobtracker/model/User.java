@@ -15,6 +15,12 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 public class User {
 
+	public User(String email, String password) {
+		super();
+		this.email = email;
+		this.password = password;
+	}
+
 	public User() {
 		super();
 	}

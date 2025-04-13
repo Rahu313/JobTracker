@@ -1,22 +1,23 @@
 package com.jobtracker.controller;
 
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,19 +26,25 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobtracker.dto.ApiResponse;
+import com.jobtracker.dto.LoginRequest;
 import com.jobtracker.model.User;
 import com.jobtracker.service.UserService;
 import com.jobtracker.util.JwtUtil;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/user")
-
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> signup(
+    public ResponseEntity<ApiResponse> signup(
             @RequestParam("name") String name,
             @RequestParam("email") String email,
             @RequestParam("password") String password,
@@ -47,61 +54,97 @@ public class UserController {
             @RequestParam(value = "companyWebsite", required = false) String companyWebsite,
             @RequestPart(value = "resume", required = false) MultipartFile resume
     ) {
-        Map<String, Object> response = new HashMap<>();
-        String resumeFileName = null;
-
         try {
-            // Save resume if role is applicant and file is provided
+            String resumeFileName = null;
+
             if ("applicant".equalsIgnoreCase(role) && resume != null) {
-                Path uploadPath = Paths.get("uploads");
+                Path uploadPath = Paths.get("uploads/resumes");
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
-
                 resumeFileName = UUID.randomUUID() + "_" + resume.getOriginalFilename();
                 Path filePath = uploadPath.resolve(resumeFileName);
                 Files.write(filePath, resume.getBytes());
             }
 
-            // Encrypt password
-            String encodedPassword = new BCryptPasswordEncoder().encode(password);
-
-            // Save user
-            boolean saved = userService.saveUser(name, email, encodedPassword, role, skills, companyName, companyWebsite, resumeFileName);
+            boolean saved = userService.saveUser(name, email, password, role, skills, companyName, companyWebsite, resumeFileName);
 
             if (saved) {
-                response.put("status", true);
-                response.put("message", "User registered successfully.");
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok(new ApiResponse(true, "User registered successfully.", Collections.emptyList()));
             } else {
-                response.put("status", false);
-                response.put("message", "Failed to register user.");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                return ResponseEntity.internalServerError().body(new ApiResponse(false, "Failed to register user.", Collections.emptyList()));
             }
-
         } catch (Exception e) {
-            response.put("status", false);
-            response.put("message", "An error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.internalServerError().body(new ApiResponse(false, "An error occurred: " + e.getMessage(), Collections.emptyList()));
         }
     }
 
-
-       @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        return ResponseEntity.ok(userService.login(user));
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            Map<String, Object> data = userService.login(new User(loginRequest.getEmail(), loginRequest.getPassword()));
+            return ResponseEntity.ok(new ApiResponse(true, "Login successful", data));
+        } catch (RuntimeException e) {
+            return ResponseEntity.ok(new ApiResponse(false, e.getMessage(), null));
+        }
     }
 
-    @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token,
-                                           @RequestBody User updatedUser) {
-        String email = JwtUtil.getEmailFromToken(token.replace("Bearer ", ""));
-        return ResponseEntity.ok(userService.updateProfile(email, updatedUser));
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestParam Long userId,
+                                           @RequestParam String name,
+                                           @RequestParam(required = false) String newPassword,
+                                           @RequestParam String role,
+                                           @RequestParam(required = false) String skills,
+                                           @RequestParam(required = false) String companyName,
+                                           @RequestParam(required = false) String companyWebsite,
+                                           @RequestParam(required = false) MultipartFile resume) {
+        boolean updated = userService.updateUserProfile(userId, name, newPassword, role, skills, companyName, companyWebsite, resume);
+        if (updated) {
+            return ResponseEntity.ok(Map.of("status", true, "message", "Profile updated successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", false, "message", "Error updating profile"));
+        }
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
-        String email = JwtUtil.getEmailFromToken(token.replace("Bearer ", ""));
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+    public ResponseEntity<ApiResponse> getProfile(@RequestHeader("Authorization") String token) {
+       System.out.println("inside method");
+    	String email = jwtUtil.getEmailFromToken(token.replace("Bearer ", ""));
+        System.out.println(email);
+        return userService.getUserByEmail(email)
+                .map(user -> ResponseEntity.ok(new ApiResponse(true, "User profile fetched", user)))
+                .orElseGet(() -> ResponseEntity.ok(new ApiResponse(false, "User not found", null)));
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse> forgotPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+
+        boolean result = userService.handleForgotPassword(email);
+        if (result) {
+            return ResponseEntity.ok(new ApiResponse(true, "Temporary password sent to your email", null));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse(false, "Email not found", null));
+        }
+    }
+    @GetMapping("/uploads/resumes/{fileName:.+}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get("G:/JobTrackerApp/JobTracker-Backend/uploads/resumes/").resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                    .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

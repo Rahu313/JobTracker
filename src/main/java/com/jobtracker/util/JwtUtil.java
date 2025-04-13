@@ -1,30 +1,51 @@
 package com.jobtracker.util;
 
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 
-import com.jobtracker.model.User;
-
-import io.jsonwebtoken.*;
-
+@Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "Rahu86@!=";
-    private static final long EXPIRATION_TIME = 86400000; // 1 day
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    public static String generateToken(User user) {
+    @Value("${jwt.expiration}")
+    private long expirationTime;
+
+    public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("role", user.getRole())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())  // make sure to call getBytes()
                 .compact();
     }
 
-    public static String getEmailFromToken(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody().getSubject();
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
-}
 
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey.getBytes())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+    public String getEmailFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey.getBytes())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject(); // 👈 This retrieves the email you set in generateToken()
+    }
+
+}

@@ -1,13 +1,19 @@
 package com.jobtracker.service;
 
-
-
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobtracker.model.User;
 import com.jobtracker.repository.UserRepository;
@@ -16,65 +22,138 @@ import com.jobtracker.util.JwtUtil;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    public boolean saveUser(String name, String email, String password, String role,
-                            String skills, String companyName, String companyWebsite,
-                            String resumeFileName) {
+	@Autowired
+	private JwtUtil jwtUtil;
 
-        try {
-            User user = new User();
-            user.setName(name);
-            user.setEmail(email);
-            user.setPassword(password); // You should hash this in real apps
-            user.setRole(role);
+	@Autowired
+	private EmailService emailService;
 
-            if ("applicant".equalsIgnoreCase(role)) {
-                user.setSkills(skills);
-                user.setResumeFile(resumeFileName);
-            } else if ("poster".equalsIgnoreCase(role)) {
-                user.setCompanyName(companyName);
-                user.setCompanyWebsite(companyWebsite);
-            }
+	public boolean saveUser(String name, String email, String rawPassword, String role, String skills,
+			String companyName, String companyWebsite, String resumeFileName) {
+		try {
+			User user = new User();
+			user.setName(name);
+			user.setEmail(email);
+			user.setPassword(passwordEncoder.encode(rawPassword));
+			user.setRole(role);
 
-            userRepository.save(user);
-            return true;
+			if ("applicant".equalsIgnoreCase(role)) {
+				user.setSkills(skills);
+				  String uploadsDir = "uploads/resumes/";
+				 String fileUrl = "http://localhost:8080/" + uploadsDir + resumeFileName;
+	                user.setResumeFile(fileUrl);
+				
+			} else if ("poster".equalsIgnoreCase(role)) {
+				user.setCompanyName(companyName);
+				user.setCompanyWebsite(companyWebsite);
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+			userRepository.save(user);
+			return true;
 
-    public Map<String, Object> login(User loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
-        }
+	public Map<String, Object> login(User loginRequest) {
+		User user = userRepository.findByEmail(loginRequest.getEmail())
+				.orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        String token = JwtUtil.generateToken(user);
-        return Map.of("token", token, "user", user);
-    }
+		if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+			throw new RuntimeException("Invalid credentials");
+		}
 
-    public User updateProfile(String email, User updatedUser) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		String token = jwtUtil.generateToken(user.getEmail());
+		return Map.of("token", token, "user", user);
+	}
 
-        user.setName(updatedUser.getName());
-        user.setRole(updatedUser.getRole());
-        user.setProfilePic(updatedUser.getProfilePic());
+	public User updateProfile(String email, User updatedUser) {
+		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-        return userRepository.save(user);
-    }
+		user.setName(updatedUser.getName());
+		user.setRole(updatedUser.getRole());
+		user.setProfilePic(updatedUser.getProfilePic());
 
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+		return userRepository.save(user);
+	}
+
+	public Optional<User> getUserByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+
+	public boolean handleForgotPassword(String email) {
+		Optional<User> optionalUser = userRepository.findByEmail(email);
+		if (!optionalUser.isPresent())
+			return false;
+
+		User user = optionalUser.get();
+
+		String tempPassword = UUID.randomUUID().toString().substring(0, 8); // Generate temp password
+
+		// Hash password (BCrypt)
+		String hashedPassword = new BCryptPasswordEncoder().encode(tempPassword);
+		user.setPassword(hashedPassword);
+		userRepository.save(user);
+
+		try {
+			emailService.sendForgotPasswordTemplate(user.getEmail(), user.getName(), tempPassword);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+	public boolean updateUserProfile(Long userId, String name, String rawPassword, String role, String skills,
+            String companyName, String companyWebsite, MultipartFile resumeFile) {
+try {
+Optional<User> optionalUser = userRepository.findById(userId);
+if (!optionalUser.isPresent()) return false;
+
+User user = optionalUser.get();
+user.setName(name);
+
+if (rawPassword != null && !rawPassword.trim().isEmpty()) {
+user.setPassword(passwordEncoder.encode(rawPassword));
 }
 
+if ("applicant".equalsIgnoreCase(role)) {
+user.setSkills(skills);
+
+if (resumeFile != null && !resumeFile.isEmpty()) {
+String uploadsDir = "uploads/resumes/";
+String realPath = new File(uploadsDir).getAbsolutePath();
+
+File uploadDir = new File(realPath);
+if (!uploadDir.exists()) uploadDir.mkdirs();
+
+String fileName = System.currentTimeMillis() + "_" + resumeFile.getOriginalFilename();
+Path filePath = Paths.get(realPath, fileName);
+Files.copy(resumeFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+// Save full file URL
+String fileUrl = "http://localhost:8080/" + uploadsDir + fileName;
+user.setResumeFile(fileUrl);
+}
+} else if ("poster".equalsIgnoreCase(role)) {
+user.setCompanyName(companyName);
+user.setCompanyWebsite(companyWebsite);
+}
+
+userRepository.save(user);
+return true;
+
+} catch (Exception e) {
+e.printStackTrace();
+return false;
+}
+}
+
+}
