@@ -33,6 +33,14 @@
             <label for="resume" class="form-label">Upload Resume</label>
             <input type="file" id="resume" class="form-control" (change)="onFileChange($event)" />
           </div>
+          
+          <!-- Show preview if resume exists -->
+          <div class="mb-3" *ngIf="userData?.resumeFile">
+            <button type="button" class="btn btn-outline-primary" (click)="previewResume()">
+              View Resume
+            </button>
+          </div>
+          
 
           <div class="mb-3">
             <label for="skills" class="form-label">Skills</label>

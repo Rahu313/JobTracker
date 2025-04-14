@@ -33,9 +33,7 @@ export class ManageProfileComponent {
     }, { validators: this.passwordMatchValidator });
     
     this.authService.getProfile().subscribe((res:any)=>{
-      console.log(res)
       if(res.status==true){
-        // this.toastrService.error('Error',res.message)
         this.userData=res.data;
         this.initFormGroup();
       }
@@ -109,13 +107,25 @@ export class ManageProfileComponent {
     this.authService.updateProfile(formData).subscribe(
       (res: any) => {
         if (res.status === true) {
-          this.toastrService.success('Success', res.message);
+          this.toastrService.success( res.message,'Success');
           this.ngOnInit(); // refresh user data
         } else {
-          this.toastrService.error('Error', res.message);
+          this.toastrService.error( res.message,'Error');
         }
       },
-      (err) => this.toastrService.error('Error', err.message)
+      (err) => this.toastrService.error( err.message,'Error')
     );
   }
+  previewResume(): void {
+    if (!this.userData?.resumeFile) {
+      this.toastrService.warning('Resume not available');
+      return;
+    }
+  const path=this.userData?.resumeFile;
+    const filename = path.split('\\').pop(); // for Windows-style paths
+  
+    const resumeUrl = `http://localhost:8080/api/user/uploads/resumes/${filename}`;
+    window.open(resumeUrl, '_blank');
+  }
+  
 }
