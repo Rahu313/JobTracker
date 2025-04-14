@@ -26,7 +26,7 @@ public class SecurityConfig {
             .and()
             .csrf().disable() // Disable CSRF since you're using JWT and stateless authentication
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/forgot-password","/uploads/**").permitAll() // Allow public access to authentication-related routes
+                .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/forgot-password","/uploads/**","/api/user/uploads/**").permitAll() // Allow public access to authentication-related routes
                 .anyRequest().authenticated() // Require authentication for all other routes
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter before Spring Security's default filter

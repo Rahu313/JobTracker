@@ -45,9 +45,7 @@ public class UserService {
 
 			if ("applicant".equalsIgnoreCase(role)) {
 				user.setSkills(skills);
-				  String uploadsDir = "uploads/resumes/";
-				 String fileUrl = "http://localhost:8080/" + uploadsDir + resumeFileName;
-	                user.setResumeFile(fileUrl);
+				    user.setResumeFile(resumeFileName);
 				
 			} else if ("poster".equalsIgnoreCase(role)) {
 				user.setCompanyName(companyName);
@@ -139,8 +137,7 @@ Path filePath = Paths.get(realPath, fileName);
 Files.copy(resumeFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
 // Save full file URL
-String fileUrl = "http://localhost:8080/" + uploadsDir + fileName;
-user.setResumeFile(fileUrl);
+user.setResumeFile(fileName);
 }
 } else if ("poster".equalsIgnoreCase(role)) {
 user.setCompanyName(companyName);
