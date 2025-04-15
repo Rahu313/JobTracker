@@ -1,13 +1,17 @@
 package com.jobtracker.service;
 
-import com.jobtracker.model.Job;
-import com.jobtracker.repository.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.jobtracker.model.Job;
+import com.jobtracker.repository.JobRepository;
 
 @Service
 public class JobService {
@@ -51,20 +55,24 @@ public class JobService {
         return job.orElse(null);
     }
 
-    // Get a list of jobs with pagination, sorting, and searching
-    public List<Job> getJobs(int page, int size, String sort, String direction, String search) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-        if ("desc".equalsIgnoreCase(direction)) {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
+    public List<Job> getJobs(Long userId, int page, int size, String sort, String direction, String search) {
+        Sort.Order order = "desc".equalsIgnoreCase(direction)
+            ? Sort.Order.desc(sort)
+            : Sort.Order.asc(sort);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(order));
+        Page<Job> jobPage;
+
+        if (search != null && !search.isEmpty()) {
+            // Search with user filter
+            jobPage = jobRepository.findByUserIdAndTitleContainingIgnoreCaseOrUserIdAndCompanyContainingIgnoreCase(
+                userId, search, userId, search, pageable);
+        } else {
+            // No search, just filter by user
+            jobPage = jobRepository.findByUserId(userId, pageable);
         }
 
-        Page<Job> jobPage;
-        if (search != null && !search.isEmpty()) {
-            jobPage = jobRepository.findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(search, search, pageable);
-        } else {
-            jobPage = jobRepository.findAll(pageable);
-        }
-        
         return jobPage.getContent();
     }
+
 }

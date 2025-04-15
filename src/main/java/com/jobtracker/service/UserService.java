@@ -152,5 +152,15 @@ e.printStackTrace();
 return false;
 }
 }
-
+	public Long findUserIdByEmail(String email) {
+	    Optional<User> user = userRepository.findByEmail(email);  // assuming you have a method in your repository
+	    
+	    // Check if the user is present in the Optional
+	    if (user.isPresent()) {
+	        return user.get().getId();  // Assuming you have a 'getId()' method in User entity
+	    }
+	    
+	    // Return null if user is not found, or you could throw an exception if preferred
+	    return null;
+	}
 }

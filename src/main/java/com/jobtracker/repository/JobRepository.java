@@ -7,6 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.jobtracker.model.Job;
 
 public interface JobRepository extends JpaRepository<Job, Long> {
-    Page<Job> findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(String title, String company, Pageable pageable);
+	Page<Job> findByUserId(Long userId, Pageable pageable);
+
+	// For search + filter by user
+	Page<Job> findByUserIdAndTitleContainingIgnoreCaseOrUserIdAndCompanyContainingIgnoreCase(
+	    Long userId1, String title,
+	    Long userId2, String company,
+	    Pageable pageable
+	);
 
 	}
