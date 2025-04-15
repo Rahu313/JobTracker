@@ -3,6 +3,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { JobService } from '../services/job.service';
 
 @Component({
   selector: 'app-job-list',
@@ -13,27 +14,29 @@ import { FormsModule } from '@angular/forms';
 })
 export class JobListComponent {
   searchTerm: string = '';
+  jobs: any[] = [];
 
-  jobs = [
-    {
-      title: 'Frontend Developer',
-      company: 'TechNova',
-      location: 'New York',
-      postedDate: new Date()
-    },
-    {
-      title: 'Backend Developer',
-      company: 'CodeCraft',
-      location: 'San Francisco',
-      postedDate: new Date()
-    },
-    {
-      title: 'Full Stack Engineer',
-      company: 'DevSolutions',
-      location: 'Remote',
-      postedDate: new Date()
-    }
-  ];
+  constructor(private jobService: JobService) {}
+
+  ngOnInit(): void {
+    this.fetchJobs();
+  }
+
+  fetchJobs(): void {
+    this.jobService.getAllJobs().subscribe({
+      next: (response) => {
+        if (response.status) {
+          this.jobs = response.data;
+          console.log(this.jobs)
+        } else {
+          console.error('Failed to fetch jobs:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching jobs:', error);
+      }
+    });
+  }
 
   filteredJobs() {
     if (!this.searchTerm) {

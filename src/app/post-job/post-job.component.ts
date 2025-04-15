@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { JobService } from '../services/job.service';
 
 @Component({
   selector: 'app-post-job',
@@ -14,7 +16,7 @@ import { RouterModule } from '@angular/router';
 export class PostJobComponent {
   jobForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,private toastrService:ToastrService,private jobService:JobService, private router:Router) {
     this.jobForm = this.fb.group({
       title: ['', Validators.required],
       company: ['', Validators.required],
@@ -24,10 +26,25 @@ export class PostJobComponent {
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.jobForm.valid) {
-      console.log('Job Posted:', this.jobForm.value);
-      // Call backend API here
+      const jobData = this.jobForm.value; // jobData is just a plain JS object
+
+      this.jobService.postJob(jobData).subscribe(
+        (response:any) => {
+          if (response.status==true) {
+            this.toastrService.success(response.message,'Success');
+            this.router.navigate(['/jobs']);
+            
+          } else {
+            this.toastrService.success(response.message,'Error');
+          }
+        },
+        (error) => {
+          console.error(error);
+          this.toastrService.success(error.message,'Success');
+        }
+      );
     }
   }
 }
