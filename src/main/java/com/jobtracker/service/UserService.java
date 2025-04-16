@@ -163,4 +163,7 @@ return false;
 	    // Return null if user is not found, or you could throw an exception if preferred
 	    return null;
 	}
+	public User findById(Long id) {
+	    return userRepository.findById(id).orElse(null);
+	}
 }
