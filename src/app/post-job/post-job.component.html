@@ -1,87 +1,103 @@
-
 <div class="container min-vh-100 d-flex align-items-center justify-content-center bg-light">
-    <div class="row justify-content-center w-100">
-      <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-        <div class="card shadow-lg p-4 border-0">
-          <h4 class="text-center mb-4 text-success fw-semibold">Post a New Job</h4>
-  
-          <form [formGroup]="jobForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="title" class="form-label">Job Title</label>
-              <input
-                type="text"
-                id="title"
-                formControlName="title"
-                class="form-control"
-                placeholder="e.g. Frontend Developer"
-              />
-              <div class="form-text text-danger" *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.invalid">
-                Title is required
-              </div>
+  <div class="row justify-content-center w-100">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+      <div class="card shadow-lg p-4 border-0">
+        <h4 class="text-center mb-4 text-success fw-semibold">Post a New Job</h4>
+
+        <form [formGroup]="jobForm" (ngSubmit)="onSubmit()">
+          <!-- Existing Fields -->
+          <div class="mb-3">
+            <label for="title" class="form-label">Job Title</label>
+            <input type="text" id="title" formControlName="title" class="form-control" placeholder="e.g. Frontend Developer" />
+            <div class="form-text text-danger" *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.invalid">
+              Title is required
             </div>
-  
-            <div class="mb-3">
-              <label for="company" class="form-label">Company Name</label>
-              <input
-                type="text"
-                id="company"
-                formControlName="company"
-                class="form-control"
-                placeholder="e.g. Abacus Consultancy"
-              />
-              <div class="form-text text-danger" *ngIf="jobForm.get('company')?.touched && jobForm.get('company')?.invalid">
-                Company name is required
-              </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="company" class="form-label">Company Name</label>
+            <input type="text" id="company" formControlName="company" class="form-control" placeholder="e.g. Abacus Consultancy" />
+            <div class="form-text text-danger" *ngIf="jobForm.get('company')?.touched && jobForm.get('company')?.invalid">
+              Company name is required
             </div>
-  
-            <div class="mb-3">
-              <label for="location" class="form-label">Location</label>
-              <input
-                type="text"
-                id="location"
-                formControlName="location"
-                class="form-control"
-                placeholder="e.g. Remote or New Delhi"
-              />
-              <div class="form-text text-danger" *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.invalid">
-                Location is required
-              </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" id="location" formControlName="location" class="form-control" placeholder="e.g. Remote or New Delhi" />
+            <div class="form-text text-danger" *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.invalid">
+              Location is required
             </div>
-  
-            <div class="mb-3">
-              <label for="type" class="form-label">Job Type</label>
-              <select id="type" class="form-select" formControlName="type">
-                <option value="">Select</option>
-                <option value="Full-Time">Full-Time</option>
-                <option value="Part-Time">Part-Time</option>
-                <option value="Internship">Internship</option>
-                <option value="Contract">Contract</option>
-              </select>
-              <div class="form-text text-danger" *ngIf="jobForm.get('type')?.touched && jobForm.get('type')?.invalid">
-                Job type is required
-              </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="type" class="form-label">Job Type</label>
+            <select id="type" class="form-select" formControlName="type">
+              <option value="">Select</option>
+              <option value="Full-Time">Full-Time</option>
+              <option value="Part-Time">Part-Time</option>
+              <option value="Internship">Internship</option>
+              <option value="Contract">Contract</option>
+            </select>
+            <div class="form-text text-danger" *ngIf="jobForm.get('type')?.touched && jobForm.get('type')?.invalid">
+              Job type is required
             </div>
-  
-            <div class="mb-3">
-              <label for="description" class="form-label">Job Description</label>
-              <textarea
-                id="description"
-                formControlName="description"
-                class="form-control"
-                rows="4"
-                placeholder="Describe the job role and responsibilities..."
-              ></textarea>
-              <div class="form-text text-danger" *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.invalid">
-                Description is required
-              </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Job Description</label>
+            <textarea id="description" formControlName="description" class="form-control" rows="4" placeholder="Describe the job role and responsibilities..."></textarea>
+            <div class="form-text text-danger" *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.invalid">
+              Description is required
             </div>
-  
-            <div class="d-grid">
-              <button type="submit" class="btn btn-success" [disabled]="jobForm.invalid">Post Job</button>
-            </div>
-          </form>
-        </div>
+          </div>
+
+          <!-- New Fields -->
+          <div class="mb-3">
+            <label for="experienceRequired" class="form-label">Experience Required</label>
+            <input type="text" id="experienceRequired" formControlName="experienceRequired" class="form-control" placeholder="e.g. 2+ years" />
+          </div>
+
+          <div class="mb-3">
+            <label for="technologyStack" class="form-label">Technology Stack</label>
+            <input type="text" id="technologyStack" formControlName="technologyStack" class="form-control" placeholder="e.g. Java, Spring Boot, MySQL" />
+          </div>
+
+          <div class="mb-3">
+            <label for="salaryRange" class="form-label">Salary Range</label>
+            <input type="text" id="salaryRange" formControlName="salaryRange" class="form-control" placeholder="e.g. ₹5–8 LPA" />
+          </div>
+
+
+          <div class="mb-3">
+            <label for="status" class="form-label">Job Status</label>
+            <select id="status" class="form-select" formControlName="status">
+              <option value="">Select</option>
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+              <option value="Interviewing">Interviewing</option>
+            </select>
+          </div>
+
+          
+
+          <div class="mb-3">
+            <label for="jobLevel" class="form-label">Job Level</label>
+            <select id="jobLevel" class="form-select" formControlName="jobLevel">
+              <option value="">Select</option>
+              <option value="Intern">Intern</option>
+              <option value="Fresher">Fresher</option>
+              <option value="Junior">Junior</option>
+              <option value="Senior">Senior</option>
+              <option value="Lead">Lead</option>
+            </select>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success" [disabled]="jobForm.invalid">Post Job</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-  
+</div>
