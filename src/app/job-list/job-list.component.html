@@ -1,49 +1,81 @@
-
 <div class="container mt-4">
-    <!-- Heading -->
-    <h4 class="text-success mb-3">Manage Jobs</h4>
-  
-    <!-- Search Bar -->
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search jobs..."
-          [(ngModel)]="searchTerm"
-        />
-      </div>
-    </div>
-  
-    <!-- Job Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-success text-center">
-          <tr>
-            <th>Job Title</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Posted On</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody class="text-center">
-          <tr *ngFor="let job of filteredJobs()">
-            <td>{{ job.title }}</td>
-            <td>{{ job.company }}</td>
-            <td>{{ job.location }}</td>
-            <td>{{ job.postedDate | date: 'mediumDate' }}</td>
-            <td>
-              <button class="btn btn-sm btn-outline-primary me-1">
-                <i class="bi bi-pencil-square"></i> Edit
-              </button>
-              <button class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-trash"></i> Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <h4 class="text-success mb-3">Manage Jobs</h4>
+
+  <!-- Search Input -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search jobs..."
+        [(ngModel)]="searchTerm"
+        (input)="filterJobs()"
+      />
     </div>
   </div>
-  
+
+  <!-- Job Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="bg-success text-white text-center">
+        <tr>
+          <th class="py-3">Title</th>
+          <th class="py-3">Company</th>
+          <th class="py-3">Location</th>
+          <th class="py-3">Type</th>
+          <th class="py-3">Status</th>
+          <th class="py-3">Level</th>
+          <th class="py-3">Technology</th>
+          <th class="py-3">Experience</th>
+          <th class="py-3">Salary</th>
+          <th class="py-3">Posted By</th>
+          <th class="py-3">Actions</th>
+        </tr>
+      </thead>
+      
+      <tbody class="text-center" *ngIf="paginatedJobs.length > 0; else noJobs">
+        <tr *ngFor="let job of paginatedJobs">
+          <td>{{ job.title }}</td>
+          <td>{{ job.company }}</td>
+          <td>{{ job.location }}</td>
+          <td>{{ job.type }}</td>
+          <td>{{ job.status || 'N/A' }}</td>
+          <td>{{ job.jobLevel || 'N/A' }}</td>
+          <td>{{ job.technologyStack || 'N/A' }}</td>
+          <td>{{ job.experienceRequired || 'N/A' }}</td>
+          <td>{{ job.salaryRange || 'N/A' }}</td>
+          <td>{{ job.user?.name }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- No jobs message -->
+    <ng-template #noJobs>
+      <tr>
+        <td colspan="11" class="text-center">No jobs found.</td>
+      </tr>
+    </ng-template>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-3" *ngIf="totalPages.length > 1">
+    <ul class="pagination">
+      <li
+        class="page-item"
+        [class.active]="currentPage === page"
+        *ngFor="let page of totalPages"
+        (click)="changePage(page)"
+      >
+        <a class="page-link" href="javascript:void(0)">{{ page }}</a>
+      </li>
+    </ul>
+  </div>
+</div>

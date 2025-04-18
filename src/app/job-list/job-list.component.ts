@@ -13,8 +13,14 @@ import { JobService } from '../services/job.service';
   styleUrl: './job-list.component.scss'
 })
 export class JobListComponent {
+  allJobs: any[] = [];
+  filteredJobs: any[] = [];
+  paginatedJobs: any[] = [];
+
   searchTerm: string = '';
-  jobs: any[] = [];
+  currentPage: number = 1;
+  pageSize: number = 5;
+
 
   constructor(private jobService: JobService) {}
 
@@ -26,9 +32,8 @@ export class JobListComponent {
     this.jobService.getAllJobs().subscribe({
       next: (response) => {
         if (response.status) {
-          this.jobs = response.data;
-          console.log(this.jobs)
-        } else {
+          this.allJobs = response.data || [];
+          this.filterJobs();     } else {
           console.error('Failed to fetch jobs:', response.message);
         }
       },
@@ -37,18 +42,30 @@ export class JobListComponent {
       }
     });
   }
-
-  filteredJobs() {
-    if (!this.searchTerm) {
-      return this.jobs;
-    }
-
-    const lowerSearch = this.searchTerm.toLowerCase();
-
-    return this.jobs.filter(job =>
-      job.title.toLowerCase().includes(lowerSearch) ||
-      job.company.toLowerCase().includes(lowerSearch) ||
-      job.location.toLowerCase().includes(lowerSearch)
+ 
+  filterJobs() {
+    const term = this.searchTerm.toLowerCase();
+    this.filteredJobs = this.allJobs.filter(job =>
+      job.title?.toLowerCase().includes(term) ||
+      job.company?.toLowerCase().includes(term) ||
+      job.location?.toLowerCase().includes(term)
     );
+    this.currentPage = 1;
+    this.setPagination();
+  }
+
+  setPagination() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedJobs = this.filteredJobs.slice(start, end);
+  }
+
+  changePage(page: number) {
+    this.currentPage = page;
+    this.setPagination();
+  }
+
+  get totalPages(): number[] {
+    return Array(Math.ceil(this.filteredJobs.length / this.pageSize)).fill(0).map((_, i) => i + 1);
   }
 }
