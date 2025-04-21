@@ -13,14 +13,15 @@ import { JobService } from '../services/job.service';
   styleUrl: './job-list.component.scss'
 })
 export class JobListComponent {
-  allJobs: any[] = [];
-  filteredJobs: any[] = [];
+  jobs: any[] = [];
   paginatedJobs: any[] = [];
-
+  totalPages: number = 0;
+  pages: number[] = [];
   searchTerm: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
-
+  sortDirection: string = 'asc';
+  sortField: string = 'title'; // default sorting by 'title'
 
   constructor(private jobService: JobService) {}
 
@@ -29,43 +30,47 @@ export class JobListComponent {
   }
 
   fetchJobs(): void {
-    this.jobService.getAllJobs().subscribe({
+    const pageIndex = this.currentPage - 1;
+    this.jobService.getAllJobs(this.searchTerm, pageIndex, this.pageSize, this.sortField, this.sortDirection).subscribe({
       next: (response) => {
         if (response.status) {
-          this.allJobs = response.data || [];
-          this.filterJobs();     } else {
+          const data = response.data;
+          this.jobs = data.jobs || [];
+          this.totalPages = data.totalPages || 0;
+          this.paginatedJobs = this.jobs;
+          this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+        } else {
           console.error('Failed to fetch jobs:', response.message);
         }
       },
-      error: (error) => {
-        console.error('Error fetching jobs:', error);
+      error: (err) => {
+        console.error('Error fetching jobs:', err);
       }
     });
   }
- 
-  filterJobs() {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredJobs = this.allJobs.filter(job =>
-      job.title?.toLowerCase().includes(term) ||
-      job.company?.toLowerCase().includes(term) ||
-      job.location?.toLowerCase().includes(term)
-    );
+
+  searchJobs(): void {
     this.currentPage = 1;
-    this.setPagination();
+    this.fetchJobs();
   }
 
-  setPagination() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.paginatedJobs = this.filteredJobs.slice(start, end);
-  }
-
-  changePage(page: number) {
+  changePage(page: number): void {
     this.currentPage = page;
-    this.setPagination();
+    this.fetchJobs();
   }
 
-  get totalPages(): number[] {
-    return Array(Math.ceil(this.filteredJobs.length / this.pageSize)).fill(0).map((_, i) => i + 1);
+  sortJobs(field: string): void {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
+    this.fetchJobs();
+  }
+
+  toggleStatus(job: any): void {
+    job.status = job.status === 'Active' ? 'Inactive' : 'Active';
+    // Here, you should call the backend API to update the job status.
   }
 }
