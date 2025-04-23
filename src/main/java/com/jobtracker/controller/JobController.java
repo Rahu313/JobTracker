@@ -1,9 +1,11 @@
 package com.jobtracker.controller;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -109,24 +111,59 @@ public class JobController {
 		}
 		return ResponseEntity.ok(new ApiResponse(false, "Job not found.", Collections.emptyList()));
 	}
-
 	@GetMapping("/job-list")
-	public ResponseEntity<ApiResponse> getAllJobs(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sort,
-			@RequestParam(defaultValue = "asc") String direction, @RequestParam(required = false) String search) {
-		try {
+	public ResponseEntity<ApiResponse> getAllJobs(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(defaultValue = "id") String sort,
+	        @RequestParam(defaultValue = "asc") String direction,
+	        @RequestParam(required = false) String search,
+	        @RequestParam(required = false) String status // To filter active/inactive jobs
+	) {
+	    try {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        String username = authentication.getName();
+	        Long userId = userService.findUserIdByEmail(username);
 
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			String username = authentication.getName(); // or use a custom UserDetails implementation to get userId
+	        // Pass new params to service layer
+	        Page<Job> jobPage = jobService.getJobs(userId, page, size, sort, direction, search, status);
 
-			Long userId = userService.findUserIdByEmail(username); // if you store userId in DB
-			System.out.println(username);
-			List<Job> jobs = jobService.getJobs(userId, page, size, sort, direction, search);
-			return ResponseEntity.ok(new ApiResponse(true, "Jobs fetched successfully.", jobs));
-		} catch (Exception e) {
-			return ResponseEntity
-					.ok(new ApiResponse(false, "Error fetching jobs: " + e.getMessage(), Collections.emptyList()));
-		}
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("jobs", jobPage.getContent());
+	        response.put("totalPages", jobPage.getTotalPages());
+	        response.put("totalElements", jobPage.getTotalElements());
+	        response.put("currentPage", jobPage.getNumber());
+
+	        return ResponseEntity.ok(new ApiResponse(true, "Jobs fetched successfully.", response));
+	    } catch (Exception e) {
+	        return ResponseEntity
+	                .ok(new ApiResponse(false, "Error fetching jobs: " + e.getMessage(), Collections.emptyMap()));
+	    }
 	}
+	@GetMapping("/browse-jobs")
+	public ResponseEntity<ApiResponse> browseJobs(
+	    @RequestParam(defaultValue = "0") int page,
+	    @RequestParam(defaultValue = "10") int size,
+	    @RequestParam(required = false) String search
+	) {
+	    try {
+	        Page<Job> jobs = jobService.getAllActiveJobs(page, size, search);
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("jobs", jobs.getContent());
+	        response.put("totalPages", jobs.getTotalPages());
+	        response.put("totalElements", jobs.getTotalElements());
+	        response.put("currentPage", jobs.getNumber());
+
+	        return ResponseEntity.ok(new ApiResponse(true, "Active jobs fetched successfully", response));
+	    } catch (Exception e) {
+	        return ResponseEntity.ok(
+	            new ApiResponse(false, "Error: " + e.getMessage(), Collections.emptyMap())
+	        );
+	    }
+	}
+
+
+	
 
 }

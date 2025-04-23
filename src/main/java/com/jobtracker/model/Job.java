@@ -1,7 +1,19 @@
 package com.jobtracker.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import com.jobtracker.enums.JobStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 
 @Entity
@@ -10,7 +22,7 @@ import lombok.Builder;
 public class Job {
     public Job(Long id, String title, String company, String location, String type, String description,
 			String experienceRequired, String technologyStack, String salaryRange, LocalDateTime createdDate, User user,
-			String status, String jobLevel) {
+			JobStatus status, String jobLevel) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -55,8 +67,9 @@ public class Job {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String status; // Open, Closed, Interviewing, etc.
-
+@Enumerated(EnumType.STRING)
+@Column(name = "status", nullable = false)
+private JobStatus status = JobStatus.ACTIVE; // default
 
     private String jobLevel; // Intern, Fresher, Junior, etc.
 
@@ -171,14 +184,6 @@ public class Job {
 	}
 
 
-	public String getStatus() {
-		return status;
-	}
-
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
 
 
 	public String getJobLevel() {
@@ -188,5 +193,15 @@ public class Job {
 
 	public void setJobLevel(String jobLevel) {
 		this.jobLevel = jobLevel;
+	}
+
+
+	public JobStatus getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(JobStatus status) {
+		this.status = status;
 	}
 }
