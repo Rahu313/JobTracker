@@ -31,7 +31,7 @@ export class PostJobComponent {
       experienceRequired: [''],
       technologyStack: [''],
       salaryRange: [''],
-      status: [''],
+      // status: [''],
       jobLevel: [''],
     });
   }

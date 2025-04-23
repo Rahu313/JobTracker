@@ -3,6 +3,8 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { JobService } from '../services/job.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-browse-jobs',
@@ -12,40 +14,34 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './browse-jobs.component.scss'
 })
 export class BrowseJobsComponent {
-  searchTerm = '';
-
-  jobs = [
-    {
-      title: 'Frontend Developer',
-      company: 'TechNova Inc.',
-      description: 'Work on cutting-edge web applications using Angular.',
-      location: 'New York, NY',
-      postedDate: new Date('2025-03-01'),
-    },
-    {
-      title: 'Backend Engineer',
-      company: 'CodeCraft Labs',
-      description: 'Develop scalable APIs with Node.js and Express.',
-      location: 'San Francisco, CA',
-      postedDate: new Date('2025-03-28'),
-    },
-    {
-      title: 'UI/UX Designer',
-      company: 'DesignMinds',
-      description: 'Create intuitive and beautiful user experiences.',
-      location: 'Remote',
-      postedDate: new Date('2025-03-20'),
-    },
-  ];
-
-  filteredJobs() {
-    if (!this.searchTerm.trim()) return this.jobs;
-
-    const lowerTerm = this.searchTerm.toLowerCase();
-    return this.jobs.filter(
-      (job) =>
-        job.title.toLowerCase().includes(lowerTerm) ||
-        job.company.toLowerCase().includes(lowerTerm)
-    );
+  searchTerm: string = '';
+  jobs: any[] = [];
+  totalPages = 0;
+  currentPage = 0;
+  pageSize = 10;
+  
+  constructor(private jobService: JobService,private toastrService:ToastrService) {}
+  
+  ngOnInit() {
+    this.loadJobs(0);
   }
+  
+  loadJobs(page: number) {
+    this.jobService.getBrowseJobs(page, this.pageSize, this.searchTerm).subscribe((res) => {
+      if (res.status) {
+        this.toastrService.success(res.message,'Success')
+        this.jobs = res.data.jobs;
+        this.totalPages = res.data.totalPages;
+        this.currentPage = res.data.currentPage;
+      }
+      else{
+        this.toastrService.error(res.message,'Error')
+      }
+    });
+  }
+  
+  filteredJobs() {
+    return this.jobs;
+  }
+  
 }

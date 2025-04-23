@@ -31,7 +31,7 @@ export class JobListComponent {
 
   fetchJobs(): void {
     const pageIndex = this.currentPage - 1;
-    this.jobService.getAllJobs(this.searchTerm, pageIndex, this.pageSize, this.sortField, this.sortDirection).subscribe({
+    this.jobService.getAllJobs( pageIndex, this.pageSize, this.sortField, this.sortDirection,this.searchTerm).subscribe({
       next: (response) => {
         if (response.status) {
           const data = response.data;

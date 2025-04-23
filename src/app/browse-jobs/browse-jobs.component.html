@@ -1,7 +1,6 @@
 
-
 <div class="container mt-4">
-  <h3 class="text-success mb-3">Browse Jobs</h3>
+  <h3 class="text-success mb-4">Browse Jobs</h3>
 
   <!-- Search Bar -->
   <div class="row mb-4">
@@ -11,6 +10,7 @@
         class="form-control"
         placeholder="Search by job title or company"
         [(ngModel)]="searchTerm"
+        (input)="loadJobs(0)" 
       />
     </div>
   </div>
@@ -18,22 +18,21 @@
   <!-- Job Cards -->
   <div class="row g-4">
     <div
-      class="col-md-6"
+      class="col-md-4"
       *ngFor="let job of filteredJobs()"
     >
-      <div class="card shadow-sm h-100">
+      <div class="card shadow-sm h-100 p-3 border-success border-1">
         <div class="card-body">
-          <h5 class="card-title text-success">{{ job.title }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
-          <p class="card-text">{{ job.description }}</p>
-          <p class="card-text mb-1">
-            <strong>Location:</strong> {{ job.location }}
-          </p>
-          <p class="card-text">
-            <strong>Posted On:</strong>
-            {{ job.postedDate | date: 'mediumDate' }}
-          </p>
-          <button class="btn btn-outline-success btn-sm">Apply Now</button>
+          <h5 class="card-title text-success fw-bold">{{ job.title }}</h5>
+          <!-- <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6> -->
+          <p class="mb-1"><strong>Company:</strong> {{ job.company }}</p>
+          <p class="mb-1"><strong>Experience:</strong> {{ job.experienceRequired }} years</p>
+          <p class="mb-1"><strong>Technologies:</strong> {{ job.technologyStack }}</p>
+          <p class="mb-1"><strong>Salary:</strong> ₹{{ job.salaryRange }}</p>
+          <p class="mb-1"><strong>Location:</strong> {{ job.location }}</p>
+          <p class="mb-3"><strong>Posted On:</strong> {{ job.createdDate | date: 'mediumDate' }}</p>
+
+          <button class="btn btn-outline-success btn-sm w-100">Apply Now</button>
         </div>
       </div>
     </div>

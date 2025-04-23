@@ -24,11 +24,11 @@
           <th class="py-3" (click)="sortJobs('company')">Company <i class="bi" [ngClass]="sortField === 'company' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
           <th class="py-3" (click)="sortJobs('location')">Location <i class="bi" [ngClass]="sortField === 'location' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
           <th class="py-3" (click)="sortJobs('type')">Type <i class="bi" [ngClass]="sortField === 'type' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
-          <th class="py-3">Status</th>
-          <th class="py-3">Level</th>
-          <th class="py-3">Technology</th>
-          <th class="py-3">Experience</th>
-          <th class="py-3">Salary</th>
+          <th class="py-3" (click)="sortJobs('status')">Status<i class="bi" [ngClass]="sortField === 'status' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
+          <th class="py-3"  (click)="sortJobs('level')">Level<i class="bi" [ngClass]="sortField === 'level' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
+          <th class="py-3" (click)="sortJobs('technology')">Technology<i class="bi" [ngClass]="sortField === 'technology' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
+          <th class="py-3" (click)="sortJobs('experience')">Experience<i class="bi" [ngClass]="sortField === 'experience' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
+          <th class="py-3" (click)="sortJobs('salary')">Salary<i class="bi" [ngClass]="sortField === 'salary' ? (sortDirection === 'asc' ? 'bi-caret-up' : 'bi-caret-down') : ''"></i></th>
           <th class="py-3">Posted By</th>
           <th class="py-3">Actions</th>
         </tr>
