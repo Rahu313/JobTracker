@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.jobtracker.enums.JobStatus;
 import com.jobtracker.model.Job;
 import com.jobtracker.repository.JobRepository;
 
@@ -103,10 +104,10 @@ public class JobService {
 
         if (search != null && !search.isEmpty()) {
             return jobRepository.findByStatusAndTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                "active", search, search, pageable
+                JobStatus.ACTIVE, search, search, pageable
             );
         } else {
-            return jobRepository.findByStatus("active", pageable);
+            return jobRepository.findByStatus(JobStatus.ACTIVE, pageable);
         }
     }
 

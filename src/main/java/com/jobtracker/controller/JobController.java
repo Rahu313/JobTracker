@@ -2,6 +2,7 @@ package com.jobtracker.controller;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jobtracker.dto.ApiResponse;
 import com.jobtracker.model.Job;
 import com.jobtracker.model.User;
+import com.jobtracker.service.EncryptionService;
 import com.jobtracker.service.JobService;
 import com.jobtracker.service.UserService;
 
@@ -32,6 +34,8 @@ public class JobController {
 	private JobService jobService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private EncryptionService encryptionService;
 
 	@PostMapping("/post-job")
 	public ResponseEntity<ApiResponse> postJob(@RequestBody Job job) {
@@ -118,51 +122,78 @@ public class JobController {
 	        @RequestParam(defaultValue = "id") String sort,
 	        @RequestParam(defaultValue = "asc") String direction,
 	        @RequestParam(required = false) String search,
-	        @RequestParam(required = false) String status // To filter active/inactive jobs
+	        @RequestParam(required = false) String status
 	) {
 	    try {
 	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	        String username = authentication.getName();
 	        Long userId = userService.findUserIdByEmail(username);
 
-	        // Pass new params to service layer
 	        Page<Job> jobPage = jobService.getJobs(userId, page, size, sort, direction, search, status);
 
+	        List<Map<String, Object>> jobList = jobPage.getContent().stream().map(this::convertJobToMap).toList();
+
 	        Map<String, Object> response = new HashMap<>();
-	        response.put("jobs", jobPage.getContent());
+	        response.put("jobs", jobList);
 	        response.put("totalPages", jobPage.getTotalPages());
 	        response.put("totalElements", jobPage.getTotalElements());
 	        response.put("currentPage", jobPage.getNumber());
 
 	        return ResponseEntity.ok(new ApiResponse(true, "Jobs fetched successfully.", response));
 	    } catch (Exception e) {
-	        return ResponseEntity
-	                .ok(new ApiResponse(false, "Error fetching jobs: " + e.getMessage(), Collections.emptyMap()));
+	        return ResponseEntity.ok(new ApiResponse(false, "Error fetching jobs: " + e.getMessage(), Collections.emptyMap()));
 	    }
 	}
+
 	@GetMapping("/browse-jobs")
 	public ResponseEntity<ApiResponse> browseJobs(
-	    @RequestParam(defaultValue = "0") int page,
-	    @RequestParam(defaultValue = "10") int size,
-	    @RequestParam(required = false) String search
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(required = false) String search
 	) {
 	    try {
 	        Page<Job> jobs = jobService.getAllActiveJobs(page, size, search);
 
+	        List<Map<String, Object>> jobList = jobs.getContent().stream().map(this::convertJobToMap).toList();
+
 	        Map<String, Object> response = new HashMap<>();
-	        response.put("jobs", jobs.getContent());
+	        response.put("jobs", jobList);
 	        response.put("totalPages", jobs.getTotalPages());
 	        response.put("totalElements", jobs.getTotalElements());
 	        response.put("currentPage", jobs.getNumber());
 
 	        return ResponseEntity.ok(new ApiResponse(true, "Active jobs fetched successfully", response));
 	    } catch (Exception e) {
-	        return ResponseEntity.ok(
-	            new ApiResponse(false, "Error: " + e.getMessage(), Collections.emptyMap())
-	        );
+	        return ResponseEntity.ok(new ApiResponse(false, "Error: " + e.getMessage(), Collections.emptyMap()));
 	    }
 	}
 
+
+	private Map<String, Object> convertJobToMap(Job job) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("id", encryptionService.encrypt(job.getId())); // Encrypt Job ID
+	    map.put("title", job.getTitle());
+	    map.put("company", job.getCompany());
+	    map.put("location", job.getLocation());
+	    map.put("type", job.getType());
+	    map.put("description", job.getDescription());
+	    map.put("experienceRequired", job.getExperienceRequired());
+	    map.put("technologyStack", job.getTechnologyStack());
+	    map.put("salaryRange", job.getSalaryRange());
+	    map.put("createdDate", job.getCreatedDate());
+	    map.put("status", job.getStatus());
+	    map.put("jobLevel", job.getJobLevel());
+
+	    // Only userId and email
+	    if (job.getUser() != null) {
+	        Map<String, Object> userMap = new HashMap<>();
+	        userMap.put("id", encryptionService.encrypt(job.getUser().getId())); // Encrypt User ID
+	        userMap.put("email", job.getUser().getEmail());
+	        map.put("user", userMap);
+	    }
+
+	    return map;
+	}
 
 	
 
