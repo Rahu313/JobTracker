@@ -13,8 +13,11 @@ export class SidebarComponent implements OnInit {
   userRole: any
   constructor(private router: Router) {}
   ngOnInit(): void {
-   this.userRole = localStorage.getItem('role'); // Replace this with a dynamic value
-  }
+    if(window?.localStorage){
+      this.userRole = localStorage.getItem('role'); // Replace this with a dynamic value
+
+    }
+    }
 
   logout() {
     localStorage.clear();

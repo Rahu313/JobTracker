@@ -1,4 +1,3 @@
-
 <div class="container mt-4">
   <h3 class="text-success mb-4">Browse Jobs</h3>
 
@@ -10,29 +9,25 @@
         class="form-control"
         placeholder="Search by job title or company"
         [(ngModel)]="searchTerm"
-        (input)="loadJobs(0)" 
+        (keyup)="onSearchChange()"
       />
     </div>
   </div>
 
   <!-- Job Cards -->
   <div class="row g-4">
-    <div
-      class="col-md-4"
-      *ngFor="let job of filteredJobs()"
-    >
+    <div class="col-md-4" *ngFor="let job of filteredJobs()">
       <div class="card shadow-sm h-100 p-3 border-success border-1">
         <div class="card-body">
-          <h5 class="card-title text-success fw-bold">{{ job.title }}</h5>
-          <!-- <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6> -->
-          <p class="mb-1"><strong>Company:</strong> {{ job.company }}</p>
-          <p class="mb-1"><strong>Experience:</strong> {{ job.experienceRequired }} years</p>
-          <p class="mb-1"><strong>Technologies:</strong> {{ job.technologyStack }}</p>
-          <p class="mb-1"><strong>Salary:</strong> ₹{{ job.salaryRange }}</p>
-          <p class="mb-1"><strong>Location:</strong> {{ job.location }}</p>
-          <p class="mb-3"><strong>Posted On:</strong> {{ job.createdDate | date: 'mediumDate' }}</p>
+          <h5 class="card-title text-success fw-bold">{{ job?.title }}</h5>
+          <p class="mb-1"><strong>Company:</strong> {{ job?.company }}</p>
+          <p class="mb-1"><strong>Experience:</strong> {{ job?.experienceRequired }} years</p>
+          <p class="mb-1"><strong>Technologies:</strong> {{ job?.technologyStack }}</p>
+          <p class="mb-1"><strong>Salary:</strong> ₹{{ job?.salaryRange?.includes('LPA') ? job?.salaryRange : job?.salaryRange?  job?.salaryRange+ ' LPA':'' }}</p>
+          <p class="mb-1"><strong>Location:</strong> {{ job?.location }}</p>
+          <p class="mb-3"><strong>Posted On:</strong> {{ job?.createdDate | date: 'mediumDate' }}</p>
 
-          <button class="btn btn-outline-success btn-sm w-100">Apply Now</button>
+          <button class="btn btn-outline-success btn-sm w-100"  (click)="navigateToApplyJobs(job.id, job.title)">Apply Now</button>
         </div>
       </div>
     </div>
@@ -41,5 +36,21 @@
   <!-- No Jobs Found -->
   <div *ngIf="filteredJobs().length === 0" class="mt-4 text-center text-muted">
     <p>No jobs found matching your search.</p>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="totalPages > 1" class="d-flex justify-content-center mt-4 gap-2 flex-wrap">
+    <button class="btn btn-outline-success" [disabled]="currentPage === 0" (click)="loadJobs(currentPage - 1)">Previous</button>
+
+    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button 
+        class="btn" 
+        [ngClass]="{'btn-success': currentPage === i, 'btn-outline-success': currentPage !== i}" 
+        (click)="loadJobs(i)">
+        {{ i + 1 }}
+      </button>
+    </ng-container>
+
+    <button class="btn btn-outline-success" [disabled]="currentPage === totalPages - 1" (click)="loadJobs(currentPage + 1)">Next</button>
   </div>
 </div>

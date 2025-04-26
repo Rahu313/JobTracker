@@ -62,11 +62,17 @@
             <label for="technologyStack" class="form-label">Technology Stack</label>
             <input type="text" id="technologyStack" formControlName="technologyStack" class="form-control" placeholder="e.g. Java, Spring Boot, MySQL" />
           </div>
-
-          <div class="mb-3">
-            <label for="salaryRange" class="form-label">Salary Range</label>
-            <input type="text" id="salaryRange" formControlName="salaryRange" class="form-control" placeholder="e.g. ₹5–8 LPA" />
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="minSalary" class="form-label">Minimum Salary (in LPA)</label>
+              <input type="number" id="minSalary" class="form-control" [(ngModel)]="minSalary" placeholder="e.g. 4">
+            </div>
+            <div class="col-md-6">
+              <label for="maxSalary" class="form-label">Maximum Salary (in LPA)</label>
+              <input type="number" id="maxSalary" class="form-control" [(ngModel)]="maxSalary" placeholder="e.g. 8">
+            </div>
           </div>
+          
 
 
           <!-- <div class="mb-3">

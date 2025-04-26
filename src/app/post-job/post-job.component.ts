@@ -15,7 +15,8 @@ import { JobService } from '../services/job.service';
 })
 export class PostJobComponent {
   jobForm: FormGroup;
-
+minSalary:any;
+maxSalary:any;
   constructor(
     private fb: FormBuilder,
     private toastrService: ToastrService,
@@ -37,6 +38,9 @@ export class PostJobComponent {
   }
 
   onSubmit(): void {
+    if(this.minSalary!='' || this.maxSalary!=''){
+      this.jobForm.get('salaryRange')?.setValue( `${this.minSalary} - ${this.maxSalary} LPA`);
+    }
     if (this.jobForm.valid) {
       const jobData = this.jobForm.value;
 

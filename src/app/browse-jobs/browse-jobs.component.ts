@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { JobService } from '../services/job.service';
 import { ToastrService } from 'ngx-toastr';
@@ -18,9 +18,10 @@ export class BrowseJobsComponent {
   jobs: any[] = [];
   totalPages = 0;
   currentPage = 0;
-  pageSize = 10;
+  pageSize = 6;
+  debounceTimer: any; 
   
-  constructor(private jobService: JobService,private toastrService:ToastrService) {}
+  constructor(private jobService: JobService,private toastrService:ToastrService, private router:Router) {}
   
   ngOnInit() {
     this.loadJobs(0);
@@ -42,6 +43,19 @@ export class BrowseJobsComponent {
   
   filteredJobs() {
     return this.jobs;
+  }
+  onSearchChange() {
+    this.searchTerm = this.searchTerm.trim(); 
+
+    clearTimeout(this.debounceTimer); 
+    this.debounceTimer = setTimeout(() => {
+      this.loadJobs(0);
+    }, 500); 
+  }
+  navigateToApplyJobs(id:any, title:any){
+    console.log(id,title)
+    this.router.navigate(['/apply-job', id], { queryParams: { title:title } });
+
   }
   
 }

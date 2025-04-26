@@ -11,6 +11,7 @@ import { BrowseJobsComponent } from './browse-jobs/browse-jobs.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { DashboardLayoutComponent } from './dashboard-layout/dashboard-layout.component';
 import { ForgetPasswordComponent } from './forget-password/forget-password.component';
+import { ApplyJobComponent } from './apply-job/apply-job.component';
 
 export const routes: Routes = [{ path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'signup', component: SignUpComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [{ path: '', redirectTo: 'login', pathMatch: 'full
             { path: 'applications', component: ApplicationListComponent },
             { path: 'browse-jobs', component: BrowseJobsComponent },
             { path: 'applied-jobs', component: ApplicationsComponent },
+            { path: 'apply-job/:id', component: ApplyJobComponent },
         
         ]
       }
