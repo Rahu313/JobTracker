@@ -1,8 +1,13 @@
 package com.jobtracker.service;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import com.jobtracker.model.Application;
 import com.jobtracker.model.Job;
@@ -35,4 +40,22 @@ public class ApplicationService {
             throw new IllegalArgumentException("Invalid job or applicant");
         }
     }
+    public Page<Application> getUserApplications(Long userId, int page, int size, String search) {
+        // Find the User object by userId
+        User applicant = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appliedAt").descending());
+
+        if (search != null && !search.trim().isEmpty()) {
+            // If search is provided, search by job title or company name
+            return applicationRepository.findByApplicantAndJob_TitleContainingIgnoreCaseOrApplicantAndJob_CompanyContainingIgnoreCase(
+                    applicant, search, applicant, search, pageable);
+        } else {
+            // If no search term, just find by applicant
+            return applicationRepository.findByApplicant(applicant, pageable);
+        }
+    }
+
+
 }
