@@ -1,33 +1,53 @@
-
-
 <div class="container mt-4">
-  <h3 class="text-success mb-3">My Applications</h3>
+  <h3 class="text-success mb-4">My Applications</h3>
 
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input
+      type="text"
+      class="form-control"
+      placeholder="Search by Job Title or Company Name"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+    />
+    </div>
+  </div>
   <div class="row g-4">
-    <div class="col-md-6" *ngFor="let app of applications">
-      <div class="card shadow-sm h-100">
+    <div class="col-md-4" *ngFor="let application of applications">
+      <div class="card shadow-sm h-100 p-3 border-success border-1">
         <div class="card-body">
-          <h5 class="card-title text-success">{{ app.jobTitle }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{ app.companyName }}</h6>
-          <p class="card-text mb-1">
-            <strong>Applied On:</strong> {{ app.appliedOn | date: 'mediumDate' }}
-          </p>
-          <p class="card-text mb-1">
-            <strong>Status:</strong>
-            <span [ngClass]="{
-              'text-primary': app.status === 'Under Review',
-              'text-success': app.status === 'Accepted',
-              'text-danger': app.status === 'Rejected'
-            }">{{ app.status }}</span>
-          </p>
-          <a [routerLink]="['/job-details', app.jobId]" class="btn btn-outline-secondary btn-sm me-2">View Job</a>
-          <button class="btn btn-outline-danger btn-sm" (click)="withdrawApplication(app)">Withdraw</button>
+          <h5 class="card-title text-success fw-bold">{{ application.jobTitle }}</h5>
+          <p class="mb-1"><strong>Company:</strong> {{ application.companyName }} </p>
+          <p class="mb-1"><strong>Status:</strong> {{ application.status }} </p>
+          <p class="mb-1"><strong>Salary:</strong> ₹{{ application?.salaryRange?.includes('LPA') ? application?.salaryRange : application?.salaryRange?  application?.salaryRange+ ' LPA':'' }} </p>
+          <!-- <p class="mb-1"><strong>Technologies:</strong> {{ job?.technologyStack }}</p>
+          <p class="mb-1"><strong>Salary:</strong> ₹{{ job?.salaryRange?.includes('LPA') ? job?.salaryRange : job?.salaryRange?  job?.salaryRange+ ' LPA':'' }}</p>
+          <p class="mb-1"><strong>Location:</strong> {{ job?.location }}</p>-->
+          <p class="mb-3"><strong>Applied At:</strong> {{ application?.appliedAt | date: 'mediumDate' }}</p> 
+<!-- 
+          <button class="btn btn-outline-success btn-sm w-100"  (click)="navigateToApplyJobs(job.id, job.title)">Apply Now</button> -->
         </div>
       </div>
     </div>
   </div>
 
   <div *ngIf="applications.length === 0" class="mt-4 text-center text-muted">
-    <p>You haven't applied to any jobs yet.</p>
+    <p>No application found matching your search.</p>
+  </div>
+
+
+  <div *ngIf="totalPages > 1" class="d-flex justify-content-center mt-4 gap-2 flex-wrap">
+    <button class="btn btn-outline-success" [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">Previous</button>
+
+    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button 
+        class="btn" 
+        [ngClass]="{'btn-success': currentPage === i, 'btn-outline-success': currentPage !== i}" 
+        (click)="changePage(i)">
+        {{ i + 1 }}
+      </button>
+    </ng-container>
+
+    <button class="btn btn-outline-success" [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)">Next</button>
   </div>
 </div>

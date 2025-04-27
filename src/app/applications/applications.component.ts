@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { ApplicationService } from '../services/application.service';
 
 @Component({
   selector: 'app-applications',
@@ -11,34 +12,59 @@ import { NavbarComponent } from '../navbar/navbar.component';
   templateUrl: './applications.component.html',
   styleUrl: './applications.component.scss'
 })
-export class ApplicationsComponent {
-  applications = [
-    {
-      jobId: 1,
-      jobTitle: 'Frontend Developer',
-      companyName: 'TechVision Inc.',
-      appliedOn: new Date('2025-04-03'),
-      status: 'Under Review'
-    },
-    {
-      jobId: 2,
-      jobTitle: 'Backend Engineer',
-      companyName: 'InnovateSoft',
-      appliedOn: new Date('2025-04-04'),
-      status: 'Accepted'
-    },
-    {
-      jobId: 3,
-      jobTitle: 'UI/UX Designer',
-      companyName: 'DesignPro Studio',
-      appliedOn: new Date('2025-04-05'),
-      status: 'Rejected'
-    }
-  ];
+export class ApplicationsComponent implements OnInit {
+  applications: any[] = [];
+  currentPage: number = 0;
+  totalPages: number = 0;
+  totalElements: number = 0;
+  pageSize: number = 6;
+  searchTerm: string = '';
+  debounceTimer: any; 
+  
 
-  withdrawApplication(application: any) {
-    if (confirm(`Are you sure you want to withdraw your application for ${application.jobTitle}?`)) {
-      this.applications = this.applications.filter(app => app.jobId !== application.jobId);
+  constructor(private applicationService: ApplicationService) {}
+
+  ngOnInit(): void {
+    this.fetchApplications();
+  }
+
+  fetchApplications(): void {
+    this.applicationService.getMyApplications(this.currentPage, this.pageSize, this.searchTerm)
+      .subscribe(
+        (response) => {
+          if (response.status) {
+            this.applications = response.data.applications;
+            this.totalPages = response.data.totalPages;
+            this.totalElements = response.data.totalElements;
+            this.currentPage = response.data.currentPage;
+          } else {
+            this.applications = [];
+          }
+        },
+        (error) => {
+          console.error('Error fetching applications', error);
+        }
+      );
+  }
+
+  changePage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.fetchApplications();
     }
   }
+  onSearch() {
+    this.searchTerm = this.searchTerm.trim(); 
+
+    clearTimeout(this.debounceTimer); 
+    this.debounceTimer = setTimeout(() => {
+      this.fetchApplications();
+    }, 500); 
+  }
+
+  // onSearch(): void {
+  //   this.currentPage = 0;
+  //   this.fetchApplications();
+  // }
+  
 }
